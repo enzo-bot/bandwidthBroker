@@ -15,11 +15,13 @@ public class QueryAlgorithm {
 	}
 	
 	public boolean isFreeBE(String network, double asked) {
-		return Double.valueOf(this.networks.getUsageBE(network)) + asked < this.slas.getBandwidthBE(network);
+		return Double.valueOf(this.networks.getUsageBE_up(network)) + asked <= this.slas.getBandwidthBE_up(network)
+				&& Double.valueOf(this.networks.getUsageBE_down(network)) + asked <= this.slas.getBandwidthBE_down(network);
 	}
 	
 	public boolean isFreePREMIUM(String network, double asked) {
-		return Double.valueOf(this.networks.getUsagePREMIUM(network)) + asked < this.slas.getBandwidthPREMIUM(network);
+		return Double.valueOf(this.networks.getUsagePREMIUM_up(network)) + asked <= this.slas.getBandwidthPREMIUM_up(network)
+				&& Double.valueOf(this.networks.getUsagePREMIUM_down(network)) + asked <= this.slas.getBandwidthPREMIUM_down(network);
 	}
 	
 	/**
@@ -64,14 +66,20 @@ public class QueryAlgorithm {
 	public void releaseResources(String emitterNetwork, String receiverNetwork, 
 			String type, double asked) throws WrongReleaseQueryException {
 		if(type.equals("BE")) {
-			if(this.networks.getUsageBE(emitterNetwork)>0 && this.networks.getUsageBE(receiverNetwork)>0) {
+			if(this.networks.getUsageBE_up(emitterNetwork)-asked>=0 
+					&& this.networks.getUsageBE_down(emitterNetwork)-asked>=0
+					&& this.networks.getUsageBE_up(receiverNetwork)-asked>=0
+					&& this.networks.getUsageBE_down(receiverNetwork)-asked>=0) {
 				this.networks.subUsageBE(emitterNetwork, asked);
 				this.networks.subUsageBE(receiverNetwork, asked);
 			} else {
 				throw new WrongReleaseQueryException();
 			}
 		} else if(type.equals("PREMIUM")) {
-			if(this.networks.getUsagePREMIUM(emitterNetwork)>0 && this.networks.getUsagePREMIUM(receiverNetwork)>0) {
+			if(this.networks.getUsagePREMIUM_up(emitterNetwork)-asked>=0
+					&& this.networks.getUsagePREMIUM_down(emitterNetwork)-asked>=0
+					&& this.networks.getUsagePREMIUM_up(receiverNetwork)-asked>=0
+					&& this.networks.getUsagePREMIUM_down(receiverNetwork)-asked>=0) {
 				this.networks.subUsagePREMIUM(emitterNetwork, asked);
 				this.networks.subUsagePREMIUM(receiverNetwork, asked);
 			} else {

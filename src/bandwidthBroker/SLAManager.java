@@ -20,13 +20,23 @@ public class SLAManager{
 		return this.slas.getString(query);
 	}
 	
-	public int getBandwidthBE(String network) {
-		String query = "bandwidthBE_" + network;
+	public int getBandwidthBE_up(String network) {
+		String query = "bandwidthBE_" + network + "_up";
 		return Integer.valueOf(this.slas.getString(query));
 	}
 	
-	public int getBandwidthPREMIUM(String network) {
+	public int getBandwidthBE_down(String network) {
+		String query = "bandwidthBE_" + network + "_down";
+		return Integer.valueOf(this.slas.getString(query));
+	}
+	
+	public int getBandwidthPREMIUM_up(String network) {
 		String query = "bandwidthPREMIUM_" + network;
+		return Integer.valueOf(this.slas.getString(query));
+	}
+	
+	public int getBandwidthPREMIUM_down(String network) {
+		String query = "bandwidthPREMIUM_" + network + "_down";
 		return Integer.valueOf(this.slas.getString(query));
 	}
 }
