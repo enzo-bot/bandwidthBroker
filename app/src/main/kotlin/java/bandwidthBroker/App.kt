@@ -3,16 +3,20 @@ package bandwidthBroker
 import io.ktor.application.*
 import io.ktor.features.ContentNegotiation
 import io.ktor.gson.*
+import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
-import io.ktor.http.*
-
 
 class App {
+    var algo : QueryAlgorithm? = null;
+
     fun main() {
+        
+        //QueryAlgorithm algo = new QueryAlgorithm();
+        this.algo = QueryAlgorithm(); 
         embeddedServer(Netty, port = 8080) { module() }.start(wait = true)
     }
 
@@ -20,29 +24,36 @@ class App {
         install(ContentNegotiation) { gson { setPrettyPrinting() } }
 
         routing {
-            get("/") { call.respondText("Hello, World!") }
+        //public void allocateResources(String emitterNetwork, String receiverNetwork,
+			String //type, double asked) throws NotEnoughResourcesException {
+            post("/reservation") {
+                val requestBody = call.receive<Map<String, Any>>()
+                val emitter = requestBody["emitter"] as? String
+                val receiver = requestBody["receiver"] as? String
+                val type = requestBody["type"] as? String
+                val bandwidth = requestBody["bandwidth"] as? Double
 
-            get("/api") { call.respond(HttpStatusCode.OK, mapOf("message" to "Hello from Ktor!")) }
+                if( emitter == null || receiver == null || type == null || bandwidth == null) {
+                    call.respond(
+                            HttpStatusCode.BadRequest,
+                            "Missing parameters. Please provide 'emitter', 'receiver', 'type', and 'bandwidth'."
+                    )
+                    return@post
+                }
+                try {
+                    algo?.allocateResources(emitter, receiver, type, bandwidth)
+                    
+                } catch(e: Exception){
+                    call.respond(
+                            HttpStatusCode.BadRequest,
+                            "AllocateResources failed with exception: " + e
+                    )
+                    return@post
+                }
 
-            post("/api") {
-                val post = call.receive<Map<String, String>>()
-                call.respond(HttpStatusCode.OK,mapOf("received" to post))
-            }
-            get("/notfound") {
-                call.respond(HttpStatusCode.NotFound, mapOf("error" to "Resource not found"))
-            }
+                val response = mapOf("Message" to "Successfully allocated $bandwidth Mb")
 
-            post("/create") {
-                val post = call.receive<Map<String, String>>()
-                call.respond(HttpStatusCode.Created, mapOf("created" to post))
-            }
-
-            get("/unauthorized") {
-                call.respond(HttpStatusCode.Unauthorized, mapOf("error" to "Unauthorized access"))
-            }
-
-            get("/custom") {
-                call.respond(HttpStatusCode(418, "I'm a teapot"), mapOf("message" to "I'm a teapot"))
+                call.respond(HttpStatusCode.OK, response)
             }
         }
     }
