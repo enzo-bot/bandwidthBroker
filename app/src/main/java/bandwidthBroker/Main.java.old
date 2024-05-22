@@ -4,6 +4,7 @@ public class Main {
 	
 	public static void main(String[] args) {
 		QueryAlgorithm algo = new QueryAlgorithm();
+		System.out.println("Test");
 		
 		try {
 			System.out.println("Trying to allocate resources");
