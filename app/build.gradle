@@ -10,7 +10,13 @@ plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
     id 'application'
     id 'org.jetbrains.kotlin.jvm' version '2.0.0'
-    id 'com.github.johnrengelman.shadow' version '8.1.1'
+    id 'com.github.johnrengelman.shadow' version '7.0.0'
+}
+
+shadowJar {
+   archiveBaseName.set('BandwidthBroker')
+   archiveClassifier.set('')
+   archiveVersion.set('')
 }
 
 repositories {
@@ -20,6 +26,10 @@ repositories {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    // https://mvnrepository.com/artifact/com.jcraft/jsch
+    implementation group: 'com.jcraft', name: 'jsch', version: '0.1.55'
+    // https://mvnrepository.com/artifact/commons-net/commons-net
+    implementation group: 'commons-net', name: 'commons-net', version: '3.10.0'
 
     // This dependency is used by the application.
     implementation 'com.google.guava:guava:32.1.3-jre'
