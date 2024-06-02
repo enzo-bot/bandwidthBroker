@@ -41,7 +41,11 @@ class App {
                     return@post
                 }
                 try {
-                    algo?.allocateResources(emitter, receiver, type, bandwidth)
+                    var receiver_network = NetworkPrefixExtractor.getNetworkPrefix(receiver,24)
+                    var emitter_network = NetworkPrefixExtractor.getNetworkPrefix(receiver,24)
+                    println("emitter net : " + emitter_network)
+                    println("receiver net : " + receiver_network)
+                    algo?.allocateResources(emitter_network, receiver_network, type, bandwidth)
                     
                 } catch(e: Exception){
                     call.respond(
