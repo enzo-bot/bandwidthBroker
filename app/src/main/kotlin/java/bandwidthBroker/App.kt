@@ -24,14 +24,49 @@ class App {
         install(ContentNegotiation) { gson { setPrettyPrinting() } }
 
         routing {
-        //public void allocateResources(String emitterNetwork, String receiverNetwork,
-			String //type, double asked) throws NotEnoughResourcesException {
-            post("/reservation") {
+            // .releaseResources("10.0.0.0/8","192.0.0.0/24","BE", 0.5);
+            post("/free") {
                 val requestBody = call.receive<Map<String, Any>>()
+                println(requestBody)
                 val emitter = requestBody["emitter"] as? String
                 val receiver = requestBody["receiver"] as? String
                 val type = requestBody["type"] as? String
                 val bandwidth = requestBody["bandwidth"] as? Double
+                println("Freeing $bandwidth Mb from $emitter to $receiver with $type")
+
+                if( emitter == null || receiver == null || type == null || bandwidth == null) {
+                    call.respond(
+                            HttpStatusCode.BadRequest,
+                            "Missing parameters. Please provide 'emitter', 'receiver', 'type', and 'bandwidth'."
+                    )
+                    return@post
+                }
+                try {
+                    var receiver_network = NetworkPrefixExtractor.getNetworkPrefix(receiver,24)
+                    var emitter_network = NetworkPrefixExtractor.getNetworkPrefix(receiver,24)
+                    algo?.releaseResources(emitter_network, receiver_network, type, bandwidth)
+                    
+                } catch(e: Exception){
+                    e.printStackTrace();
+                    call.respond(
+                            HttpStatusCode.BadRequest,
+                            "Freeing failed with exception: " + e
+                    )
+                    return@post
+                }
+
+                val response = mapOf("Message" to "Successfully freed $bandwidth Mb")
+
+                call.respond(HttpStatusCode.OK, response)
+            }
+            post("/reservation") {
+                val requestBody = call.receive<Map<String, Any>>()
+                println(requestBody)
+                val emitter = requestBody["emitter"] as? String
+                val receiver = requestBody["receiver"] as? String
+                val type = requestBody["type"] as? String
+                val bandwidth = requestBody["bandwidth"] as? Double
+                println("Freeing $bandwidth Mb from $emitter to $receiver with $type")
 
                 if( emitter == null || receiver == null || type == null || bandwidth == null) {
                     call.respond(
@@ -48,6 +83,7 @@ class App {
                     algo?.allocateResources(emitter_network, receiver_network, type, bandwidth)
                     
                 } catch(e: Exception){
+                    e.printStackTrace();
                     call.respond(
                             HttpStatusCode.BadRequest,
                             "AllocateResources failed with exception: " + e
