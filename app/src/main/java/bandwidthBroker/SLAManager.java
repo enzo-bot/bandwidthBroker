@@ -31,7 +31,7 @@ public class SLAManager{
 	}
 	
 	public int getBandwidthPREMIUM_up(String network) {
-		String query = "bandwidthPREMIUM_" + network;
+		String query = "bandwidthPREMIUM_" + network + "_up";
 		return Integer.valueOf(this.slas.getString(query));
 	}
 	
