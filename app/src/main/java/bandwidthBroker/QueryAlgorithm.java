@@ -8,10 +8,12 @@ package bandwidthBroker;
 public class QueryAlgorithm {
 	private SLAManager slas;
 	private NetworksManager networks;
+	private Reservation reservation;
 	
 	public QueryAlgorithm() {
 		slas = new SLAManager();
 		networks = new NetworksManager();
+		reservation = new Reservation();
 	}
 	
 	public boolean isFreeBE(String network, double asked) {
@@ -36,10 +38,13 @@ public class QueryAlgorithm {
 	 */
 	public void allocateResources(String emitterNetwork, String receiverNetwork,
 			String type, double asked) throws NotEnoughResourcesException {
+		// si C'est BE
 		if(type.equals("BE")) {
 			if(this.isFreeBE(emitterNetwork, asked) && this.isFreeBE(receiverNetwork, asked)) {
 				this.networks.addUsageBE(emitterNetwork, asked);
+
 				this.networks.addUsageBE(receiverNetwork, asked);
+
 			} else {
 				throw new NotEnoughResourcesException();
 			}
@@ -47,6 +52,7 @@ public class QueryAlgorithm {
 			if(this.isFreePREMIUM(emitterNetwork, asked) && this.isFreePREMIUM(receiverNetwork, asked)) {
 				this.networks.addUsagePREMIUM(emitterNetwork, asked);
 				this.networks.addUsagePREMIUM(receiverNetwork, asked);
+				this.reservation.reservationJSchBoth(emitterNetwork, receiverNetwork);
 			} else {
 				throw new NotEnoughResourcesException();
 			}
@@ -82,6 +88,7 @@ public class QueryAlgorithm {
 					&& this.networks.getUsagePREMIUM_down(receiverNetwork)-asked>=0) {
 				this.networks.subUsagePREMIUM(emitterNetwork, asked);
 				this.networks.subUsagePREMIUM(receiverNetwork, asked);
+				this.reservation.desalouerJSchBoth(emitterNetwork, receiverNetwork);
 			} else {
 				throw new WrongReleaseQueryException();
 			}
