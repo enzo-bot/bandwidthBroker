@@ -23,15 +23,19 @@ public class NetworksManager {
 		this.networksUsagePREMIUM_down = new HashMap<String,Double>();
 		
 		// Initialization of the usage variables
-		for(int i=1 ; i<this.savedNetworks.keySet().size() ; i++) {
+		for(int i=1 ; i<=this.savedNetworks.keySet().size() ; i++) {
 			this.networksUsageBE_up.put(this.savedNetworks.getString(String.valueOf(i)), (double)0);
 			this.networksUsageBE_down.put(this.savedNetworks.getString(String.valueOf(i)), (double)0);
 		}
 		
-		for(int i=1 ; i<this.savedNetworks.keySet().size() ; i++) {
+		for(int i=1 ; i<=this.savedNetworks.keySet().size() ; i++) {
 			this.networksUsagePREMIUM_up.put(this.savedNetworks.getString(String.valueOf(i)), (double)0);
 			this.networksUsagePREMIUM_down.put(this.savedNetworks.getString(String.valueOf(i)), (double)0);
 		}
+		System.out.println(networksUsageBE_up.toString());
+		System.out.println(networksUsageBE_down.toString());
+		System.out.println(networksUsagePREMIUM_up.toString());
+		System.out.println(networksUsagePREMIUM_down.toString());
 	}
 	
 	public double getUsageBE_up(String network) {
